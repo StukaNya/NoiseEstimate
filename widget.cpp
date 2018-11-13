@@ -26,9 +26,7 @@ MainWidget::MainWidget(QWidget *parent)
     imLabel         = new QLabel;
     cPlot           = new QCustomPlot();
 
-    //cPlot->setGeometry(QRect(550, 200, 400, 800));
     cPlot->setFixedSize(QSize(700, 400));
-    //outStream->setGeometry(550, 100, 400, 200);
     lineNumProc->setRange(1,4);
 
     //connect buttons
@@ -88,11 +86,9 @@ void MainWidget::receiveAxes(QVector<float> xAxe, QVector<float> yAxe, int nChn,
     cPlot->legend->setVisible(true);
     cPlot->legend->setFont(QFont("Helvetica", 9));
     cPlot->legend->setRowSpacing(-3);
-    //if (!flag || (xAx.size() != xAxe.size())) {
     xAx = xAxe;
     yAx = yAxe;
     flag = true;
-    //}
 
     QVector<QCPScatterStyle::ScatterShape> shapes;
     shapes << QCPScatterStyle::ssDisc;

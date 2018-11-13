@@ -43,7 +43,6 @@ int NoiseEstimate::compute_VH(float *VH, float **blocks_ptr, int *indices_VL, in
                               int T, int K) {
     int VH_count = 0;
 
-    //#pragma omp parallel for
     for (int q = 0; q < w*w; q++) {
         int j = q / w;
         int i = q - j*w;
@@ -97,7 +96,6 @@ void NoiseEstimate::read_all_valid_blocks(float *D,
                                           float *u,
                                           int Nx, int Ny,
                                           int w, unsigned num_blocks, int *mask) {
-    //if (mask == NULL) {
 #ifdef _OPENMP
         #pragma omp parallel for
 #endif
@@ -108,31 +106,6 @@ void NoiseEstimate::read_all_valid_blocks(float *D,
                 }
             }
         }
-    //}
-/*
-    else {
-        unsigned *valid_coords = new unsigned[num_blocks];
-        int count_coords = 0;
-        //
-        for (int i = 0; i < Nx*Ny; i++) {
-            if (mask[i] == 0)
-                valid_coords[count_coords++] = i;
-        }
-#ifdef _OPENMP
-        #pragma omp parallel for
-#endif
-        for (unsigned q = 0; q < num_blocks; q++) {
-            int addr = valid_coords[q];
-
-            for (int j = 0; j < w; j++) {
-                for (int i = 0; i < w; i++) {
-                    D[q*w*w+j*w+i] = u[j*Nx+i+addr];
-                }
-            }
-        }
-        delete[] valid_coords;
-    }
-*/
 }
 
 //! Computes the mean of all given blocks
@@ -346,14 +319,12 @@ int NoiseEstimate::runPonomarenkoEstimate(
 #ifdef DEBUG_NOISE_EST
         qInfo() << "Bad alloc! (mask_all, delta, ...)";
 #endif
-        //delete[] mask_all; mask_all = nullptr;
         delete[] delta  ; delta   = nullptr;
         delete[] vmeans ; vmeans  = nullptr;
         delete[] vstds  ; vstds   = nullptr;
-        //delete[] MatStds; MatStds = nullptr;
     }
 
-    int num_blocks = Nx*Ny;//build_mask(im, mask_all, Nx, Ny, w, num_channels);
+    int num_blocks = Nx*Ny;
     int theta = compute_delta(delta, w, T);
 
     try {
@@ -411,9 +382,6 @@ int NoiseEstimate::runPonomarenkoEstimate(
 
         read_all_valid_blocks(blocks, u, Nx, Ny, w, num_blocks, mask_all);
 
-        // Compute means
-        //compute_means(means, blocks, w, num_blocks);
-
         // Compute 2D-DCT of all the blocks
         //
         // Transform blocks with FFTW
@@ -459,15 +427,13 @@ int NoiseEstimate::runPonomarenkoEstimate(
                 delete[] VH;         VH         = nullptr;
                 //break;
             }
-            //#pragma omp critical
-            //{
+
             histInst.computeVLhist(VL, bin, w, delta, blocks_ptr, theta);
 
             // Compute VH
             argsort(VL, indices_VL, elems_bin);
             int VH_count = histInst.computeVHhist(VH, blocks_ptr, bin, indices_VL, w, T, K);
 
-            //     float bin_mean = get_bin_mean(meanMethod, K, indices_VL, bin, &histo);
             bin_mean = (float)(histInst.arrMean[histInst.arrSort[bin*elems_bin+elems_bin/2]]) / 256.f;
             tilde_sigma = sqrt(median(VH, VH_count));
 
@@ -478,10 +444,7 @@ int NoiseEstimate::runPonomarenkoEstimate(
             // Store results
             vmeans[ch*params.numBins+bin] = bin_mean;
             vstds[ch*params.numBins+bin] = tilde_sigma;
-            //}
-           // for (int ij = 0; ij < w*w; ij++) {
-           //     MatStds[ch*w*w*params.numBins + bin*w*w +ij] = tilde_sigma;
-           // }
+
 
             delete[] VL;         VL         = nullptr;
             delete[] VH;         indices_VL = nullptr;
@@ -518,8 +481,6 @@ int NoiseEstimate::runPonomarenkoEstimate(
     delete[] delta   ; delta    = nullptr;
     delete[] vmeans  ; vmeans   = nullptr;
     delete[] vstds   ; vstds    = nullptr;
-    //delete[] MatStds ; MatStds  = nullptr;
-    //delete[] means   ; means    = nullptr;
     delete[] blocks  ; blocks   = nullptr;
 
     return 0;
