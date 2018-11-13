@@ -39,7 +39,7 @@ HEADERS  += widget.h \
 RESOURCES += \
 
 QMAKE_LIBS += -lgomp
-QMAKE_CXXFLAGS += -fopenmp
+QMAKE_CXXFLAGS += -fopenmp -std=c++11
 QMAKE_LFLAGS += -fopenmp
 
 INCLUDEPATH += C:/Qt/Qt5.8.0/library/fftw

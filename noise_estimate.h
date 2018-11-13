@@ -5,14 +5,13 @@
 #include <QVector>
 #include <QDebug>
 #include <QtAlgorithms>
-#include <fftw3.h>
+#include "fftw3.h"
 
 #ifdef _OPENMP
 #include <omp.h>
 #endif
 
 #include "img_pars.h"
-#include "curve_filter.h"
 #include "hist_mean.h"
 #include "decoder.h"
 

@@ -28,6 +28,7 @@ private:
     QFile inFile;
     QByteArray inStream;
     //qimage opening
+    QString currentDir;
     QImage inImg;
     QVector<QVector<uchar> > rgbData;
     //singleton methods

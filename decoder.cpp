@@ -27,25 +27,26 @@ void DecoderJPG2::runDecoding(const QString strDir, int numProc)
     qInfo() << "Dir: " << strDir;
     qInfo() << "Num Proc: " << numProc;
 #endif
+    if (strDir != currentDir) {
+        //openFile(strDir);
+        inImg.load(strDir);
+        if (inImg.format() != QImage::Format_RGB32) {
+            inImg = inImg.convertToFormat(QImage::Format_RGB32);
+        }
 
-    //openFile(strDir);
-    inImg.load(strDir);
-    if (inImg.format() != QImage::Format_RGB32) {
-        inImg = inImg.convertToFormat(QImage::Format_RGB32);
+        imSize.width   = inImg.width();
+        imSize.height  = inImg.height();
+        imSize.wh      = imSize.width * imSize.height;
+        imSize.nChn    = (inImg.format() == QImage::Format_RGB32) ? 3 : 1;
+
+    #ifdef DEBUG_DECODER
+        qInfo() << "inImage size: " << inImg.size();
+        qInfo() << "inImage format: "<< inImg.format();
+    #endif
+
+        convertToArray();
+        currentDir = strDir;
     }
-
-    imSize.width   = inImg.width();
-    imSize.height  = inImg.height();
-    imSize.wh      = imSize.width * imSize.height;
-    imSize.nChn    = (inImg.format() == QImage::Format_RGB32) ? 3 : 1;
-
-#ifdef DEBUG_DECODER
-    qInfo() << "inImage size: " << inImg.size();
-    qInfo() << "inImage format: "<< inImg.format();
-#endif
-
-    convertToArray();
-
     emit doNoiseEstimate(rgbData, imSize, numProc);
 }
 
@@ -62,7 +63,7 @@ void DecoderJPG2::convertToArray() {
        rgbData[i].resize(imSize.wh);
 
 #ifdef _OPENMP
-#pragma omp parallel for
+    #pragma omp parallel for
 #endif
    for (i = 0; i < imSize.wh; i++)
    {

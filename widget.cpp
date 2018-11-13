@@ -65,7 +65,7 @@ void MainWidget::loadImage() {
 }
 
 void MainWidget::sendParams() {
-    const QString strDir = this->lineDir->text();
+    strDir = this->lineDir->text();
     int numProc = this->lineNumProc->value();
 
 #ifdef DEBUG_WIDGET
@@ -88,11 +88,11 @@ void MainWidget::receiveAxes(QVector<float> xAxe, QVector<float> yAxe, int nChn,
     cPlot->legend->setVisible(true);
     cPlot->legend->setFont(QFont("Helvetica", 9));
     cPlot->legend->setRowSpacing(-3);
-    if (!flag || (xAx.size() != xAxe.size())) {
+    //if (!flag || (xAx.size() != xAxe.size())) {
     xAx = xAxe;
     yAx = yAxe;
     flag = true;
-    }
+    //}
 
     QVector<QCPScatterStyle::ScatterShape> shapes;
     shapes << QCPScatterStyle::ssDisc;

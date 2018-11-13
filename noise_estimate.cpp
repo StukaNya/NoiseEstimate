@@ -1,7 +1,7 @@
 
 #include "noise_estimate.h"
 #include "../ponomarenko/framework/operations.cpp"
-#define DEBUG_NOISE_EST
+//#define DEBUG_NOISE_EST
 //#undef _OPENMP
 
 void NoiseEstimate::sendMessage(const QString str)
@@ -297,10 +297,8 @@ int NoiseEstimate::runPonomarenkoEstimate(
 
     // Read parameters
     int w = params.sizePatch;
-    int T = get_T(w);
+    int T = (w < 6) ? w : ((w < 10) ? w - 1 : w - 2);
     float p = 0.005f;
-    int D = 7;
-    int curve_filter_iterations = 5;
 
 
     // Get image properties
